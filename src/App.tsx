@@ -12,29 +12,49 @@ const Wrapper = styled(motion.div)`
   height: 100vh;
   width: 100vw;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 50vw;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  div:first-child,
-  div:last-child {
-    grid-column: span 2;
-  }
+  margin-bottom: 50px;
 `;
 
 const Box = styled(motion.div)`
-  height: 100px;
-  background-color: rgb(255, 255, 255, 1);
-  border-radius: 20px;
+  height: 200px;
+  width: 300px;
+  background-color: rgb(255, 255, 255, 0.6);
+  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const Circle = styled(motion.div)`
+  height: 60px;
+  width: 60px;
+  border-radius: 30px;
+  background-color: white;
+`;
+
+const SwitchBtn = styled(motion.button)`
+  width: 70px;
+  height: 30px;
+  background-color: white;
+  border-radius: 5px;
+  border: 0px;
+  color: rgb(0, 8, 255);
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.1);
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const Overlay = styled(motion.div)`
@@ -44,31 +64,50 @@ const Overlay = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 `;
-
+/*
+const switchClick = {
+  start: (isswitchClicked: boolean) => ({
+    scale: isswitchClicked ? 1 : 2,
+  }),
+  center: {
+    scale: 1.5,
+  },
+  end: (isswitchClicked: boolean) => ({
+    scale: isswitchClicked ? 2 : 1,
+  }),
+};
+*/
 function App() {
-  const [id, setId] = useState<null | string>(null);
-  console.log(id);
-
+  const [switchClicked, setSwitchClicked] = useState(false);
+  const [boxNumber, setBoxNumber] = useState<null | string>(null);
+  const btnClick = () => {
+    setSwitchClicked((prev) => !prev);
+  };
   return (
     <Wrapper>
       <Grid>
-        {["1", "2", "3", "4"].map((n) => (
-          <Box onClick={() => setId(n)} key={n} layoutId={n} />
-        ))}
+        <Box onClick={() => setBoxNumber("1")} layoutId="1" />
+        <Box>{!switchClicked ? <Circle layoutId="circle" /> : null}</Box>
+        <Box>{switchClicked ? <Circle layoutId="circle" /> : null}</Box>
+        <Box onClick={() => setBoxNumber("2")} layoutId="2" />
       </Grid>
-      <AnimatePresence>
-        {id ? (
-          <Overlay
-            onClick={() => setId(null)}
-            initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
-            animate={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-            exit={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
-          >
-            <Box layoutId={id} style={{ width: 200, height: 100 }} />
-          </Overlay>
-        ) : null}
-      </AnimatePresence>
+      <SwitchBtn
+        layout
+        onClick={btnClick}
+        style={{
+          scale: switchClicked ? 1.3 : 1,
+          color: switchClicked ? "rgba(255, 128, 0,1)" : "rgba(0, 8, 255,1)",
+        }}
+      >
+        Switch
+      </SwitchBtn>
+      {boxNumber ? (
+        <Overlay onClick={() => setBoxNumber(null)}>
+          <Box layoutId={boxNumber + ""} style={{ backgroundColor: "white" }} />
+        </Overlay>
+      ) : null}
     </Wrapper>
   );
 }
