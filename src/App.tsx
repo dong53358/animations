@@ -22,6 +22,12 @@ const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 50px;
+  div:first-child,
+  div:last-child {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 const Box = styled(motion.div)`
@@ -33,6 +39,13 @@ const Box = styled(motion.div)`
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const CenterBox = styled(motion.div)`
+  background-color: white;
+  height: 200px;
+  width: 300px;
+  border-radius: 5px;
 `;
 
 const Circle = styled(motion.div)`
@@ -66,48 +79,91 @@ const Overlay = styled(motion.div)`
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
 `;
-/*
-const switchClick = {
-  start: (isswitchClicked: boolean) => ({
-    scale: isswitchClicked ? 1 : 2,
+
+const boxVariants = {
+  initial: (i: string) => ({
+    scale: 1,
+    x: 0,
+    y: 0,
   }),
-  center: {
-    scale: 1.5,
-  },
-  end: (isswitchClicked: boolean) => ({
-    scale: isswitchClicked ? 2 : 1,
+  hover: (i: string) => ({
+    scale: 1.1,
+    y: i ? -15 : 15,
+    x: i ? -20 : 20,
   }),
 };
-*/
+
+const btnVariants = {
+  zero: {
+    color: "rgba(0, 8, 255,1)",
+    transform: "scale(1)",
+  },
+  one: {
+    color: "rgba(255, 128, 0,1)",
+    transform: "scale(1.1)",
+  },
+};
+
+const overlayVariants = {
+  start: {
+    opacity: 1,
+  },
+  end: {
+    opacity: 0,
+  },
+};
+
 function App() {
-  const [switchClicked, setSwitchClicked] = useState(false);
+  const [switchClicked, setSwitchClicked] = useState(0);
   const [boxNumber, setBoxNumber] = useState<null | string>(null);
   const btnClick = () => {
-    setSwitchClicked((prev) => !prev);
+    setSwitchClicked((prev) => (prev === 1 ? 0 : 1));
+  };
+  const onClickBox = (i: string) => {
+    setBoxNumber(i);
   };
   return (
     <Wrapper>
       <Grid>
-        <Box onClick={() => setBoxNumber("1")} layoutId="1" />
+        <Box
+          onClick={() => onClickBox("1")}
+          layoutId="1"
+          custom={1}
+          variants={boxVariants}
+          initial="initial"
+          whileHover="hover"
+        />
         <Box>{!switchClicked ? <Circle layoutId="circle" /> : null}</Box>
         <Box>{switchClicked ? <Circle layoutId="circle" /> : null}</Box>
-        <Box onClick={() => setBoxNumber("2")} layoutId="2" />
+        <Box
+          onClick={() => onClickBox("0")}
+          layoutId="0"
+          custom={0}
+          variants={boxVariants}
+          initial="initial"
+          whileHover="hover"
+        />
       </Grid>
       <SwitchBtn
-        layout
         onClick={btnClick}
-        style={{
-          scale: switchClicked ? 1.3 : 1,
-          color: switchClicked ? "rgba(255, 128, 0,1)" : "rgba(0, 8, 255,1)",
-        }}
+        variants={btnVariants}
+        initial="zero"
+        animate={switchClicked === 1 ? "one" : "zero"}
       >
         Switch
       </SwitchBtn>
-      {boxNumber ? (
-        <Overlay onClick={() => setBoxNumber(null)}>
-          <Box layoutId={boxNumber + ""} style={{ backgroundColor: "white" }} />
-        </Overlay>
-      ) : null}
+      <AnimatePresence>
+        {boxNumber ? (
+          <Overlay
+            onClick={() => setBoxNumber(null)}
+            variants={overlayVariants}
+            animate="start"
+            exit="end"
+          >
+            <CenterBox layoutId={boxNumber} />
+          </Overlay>
+        ) : null}
+      </AnimatePresence>
     </Wrapper>
   );
 }
