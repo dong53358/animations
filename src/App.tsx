@@ -106,6 +106,9 @@ const btnVariants = {
 
 const overlayVariants = {
   start: {
+    opacity: 0,
+  },
+  center: {
     opacity: 1,
   },
   end: {
@@ -157,7 +160,8 @@ function App() {
           <Overlay
             onClick={() => setBoxNumber(null)}
             variants={overlayVariants}
-            animate="start"
+            initial="start"
+            animate="center"
             exit="end"
           >
             <CenterBox layoutId={boxNumber} />
